@@ -1,18 +1,24 @@
 package calculator;
 
-/**
- *
- * @author admin
- */
 public class RecIntegral {
+    final double MINIMAL_DOUBLE_VALUE = 0.000001;
+    final double MAXIMUM_DOUBLE_VALUE = 1000000;
+    
     private double _topBorder = 0.0;
     private double _bottomBorder = 0.0;
     private double _stepWidth = 0.0;
     private double _result = 0.0;
     
-    public RecIntegral(double topBorder, double bottomBorder, double stepWidth) {
+    public RecIntegral(double topBorder, double bottomBorder, double stepWidth) throws IntegralValueException {
         _topBorder = topBorder;
         _bottomBorder = bottomBorder;
+        // Check of values in range
+        if (bottomBorder < MINIMAL_DOUBLE_VALUE || bottomBorder > MAXIMUM_DOUBLE_VALUE ||
+                topBorder < MINIMAL_DOUBLE_VALUE || topBorder > MAXIMUM_DOUBLE_VALUE ||
+                stepWidth < MINIMAL_DOUBLE_VALUE || stepWidth > MAXIMUM_DOUBLE_VALUE) {
+            throw new IntegralValueException(
+                    MINIMAL_DOUBLE_VALUE, MAXIMUM_DOUBLE_VALUE);
+        }
         _stepWidth = stepWidth;
         _result = Double.NaN;
     }
@@ -22,12 +28,7 @@ public class RecIntegral {
     public double getStepWidth() { return _stepWidth; }
     public double getResult() { return _result; }
     
-    public void calculateIntegral() {
-        // Ensure that the step width is positive
-        if (_stepWidth <= 0) {
-            throw new IllegalArgumentException("Step width must be positive");
-        }
-
+    public void calculateIntegral() throws StepException {
         double sign = 1.0;
         // If the top border is less than the bottom border, swap them and invert the sign of the result
         if (_topBorder < _bottomBorder) {
@@ -35,6 +36,10 @@ public class RecIntegral {
             _topBorder = _bottomBorder;
             _bottomBorder = temp;
             sign = -1.0;
+        }
+        
+        if (_stepWidth > _topBorder - _bottomBorder) {
+            throw new StepException(_stepWidth, _bottomBorder, _topBorder);
         }
 
         double sum = 0.0;

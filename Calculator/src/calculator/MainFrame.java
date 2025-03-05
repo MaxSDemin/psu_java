@@ -1,18 +1,15 @@
 package calculator;
 
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author admin
- */
 public class MainFrame extends javax.swing.JFrame {
     private final int SHADOW_COLUMN_NUMBER = 4; 
     private final String SHADOW_COLUMN_TITLE = "ShadowColumn"; 
     
-    private ArrayList<RecIntegral> _integrals;
+    private final ArrayList<RecIntegral> _integrals;
         
     /**
      * Creates new form MainFrame
@@ -163,10 +160,11 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(TopBorderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(AddButton))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(StepWidthLabel)
-                    .addComponent(BottomBorderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(DeleteButton, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(DeleteButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(StepWidthLabel)
+                        .addComponent(BottomBorderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(BottomBorderLabel)
@@ -210,8 +208,17 @@ public class MainFrame extends javax.swing.JFrame {
             return;
         }
         // Add data to table
-        RecIntegral integral = 
-                new RecIntegral(topBorder, bottomBorder, stepWidth);
+        RecIntegral integral;
+        try {
+            integral = new RecIntegral(topBorder, bottomBorder, stepWidth);
+        } catch(IntegralValueException ex){
+            JOptionPane.showMessageDialog(
+                    this, 
+                    ex.getMessage(),
+                    ex.getExceptionName(), 
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         _integrals.add(integral);
         AddIntegralToTable(DataTable, integral);
     }//GEN-LAST:event_AddButtonMouseClicked
@@ -240,7 +247,17 @@ public class MainFrame extends javax.swing.JFrame {
         RecIntegral integral = 
                 (RecIntegral)model.getValueAt(selectedRow, SHADOW_COLUMN_NUMBER);
         // Calculate result
-        integral.calculateIntegral();
+        try {
+            integral.calculateIntegral();
+        } catch(StepException ex){
+            JOptionPane.showMessageDialog(
+                    this, 
+                    ex.getMessage(),
+                    ex.getExceptionName(), 
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
         // Set result to table
         model.setValueAt(integral.getResult(), selectedRow, 3);
     }//GEN-LAST:event_CalculateButtonMouseClicked
